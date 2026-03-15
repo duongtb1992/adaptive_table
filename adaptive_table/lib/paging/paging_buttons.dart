@@ -40,6 +40,7 @@ class PagingButtons extends StatelessWidget {
                             color: primaryColor,
                             size: 12,
                           ),
+                          bgColor: lightPrimaryColor,
                           onPressed: () {
                             cubit.prev();
                           },
@@ -71,6 +72,7 @@ class PagingButtons extends StatelessWidget {
                           color: primaryColor,
                           size: 12,
                         ),
+                        bgColor: lightPrimaryColor,
                         onPressed: () {
                           cubit.next();
                         },

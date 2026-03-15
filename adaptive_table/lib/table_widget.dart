@@ -1,4 +1,4 @@
-import 'package:adaptive_table/filter/filter_view.dart';
+import 'package:adaptive_table/filter/filter_and_search_view.dart';
 import 'package:adaptive_table/paging/paging_buttons.dart';
 import 'package:adaptive_table/search/search_table_text_field.dart';
 import 'package:adaptive_table/table_presentation/table_content.dart';
@@ -32,6 +32,8 @@ class TableWidget<T> extends StatelessWidget {
   //
   final bool enableHideColumn;
   //
+  final bool enableFilter;
+  //
   final int pagingCount;
   final Function(int) onClickPagingIndex;
   //
@@ -45,6 +47,7 @@ class TableWidget<T> extends StatelessWidget {
     required this.tableTitle,
     required this.onAdd,
     this.enableHideColumn = false,
+    this.enableFilter = true,
     this.pagingCount = 1,
     required this.onClickPagingIndex,
     this.isLoading = false,
@@ -80,7 +83,6 @@ class TableWidget<T> extends StatelessWidget {
             return Column(
               children: [
                 Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Row(
@@ -92,25 +94,17 @@ class TableWidget<T> extends StatelessWidget {
                           TableAddDataButton(onAdd: onAdd, color: primaryColor)
                         ],
                       ),
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          SearchTableTextField(
-                              primaryColor: primaryColor,
-                              lightPrimaryColor: lightPrimaryColor,
-                              onSearchChange: onSearchChange,
-                              onSearchSubmit: onSearchSubmit,
-                              hintText: searchHintText ?? '',
-                          ),
-                          // SizedBox(width: 8),
-                          // FilterView(
-                          //     primaryColor: primaryColor,
-                          //     lightPrimary: lightPrimaryColor,
-                          //     columns: columns
-                          // )
-                        ],
-                      ),
+                      Expanded(
+                        child: FilterAndSearchView(
+                          primaryColor: primaryColor,
+                          lightPrimary: lightPrimaryColor,
+                          columns: columns,
+                          onSearchChange: onSearchChange,
+                          onSearchSubmit: onSearchSubmit,
+                          hintText: searchHintText ?? '',
+                          enableFilter: enableFilter,
+                        ),
+                      )
                     ]
                 ),
                 Padding(

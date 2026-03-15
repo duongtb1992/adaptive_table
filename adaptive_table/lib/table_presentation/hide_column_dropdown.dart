@@ -15,6 +15,7 @@ class HideColumnDropdownOverlay {
       List<TableColumnBase> columns,
       Color primaryColor,
       Color lightPrimaryColor,
+      {String dropDownTitle = 'CHỌN CỘT HIỂN THỊ'}
   ) {
     if (_overlayEntry != null) {
       hide();
@@ -42,7 +43,7 @@ class HideColumnDropdownOverlay {
               child: Container(color: Colors.transparent),
             ),
             Positioned(
-              right: 24,
+              left: position.dx + size.width - 267,
               top: position.dy + size.height + 8,
               child: HideColumnDropdownPanel(
                 columns: columns,
@@ -50,6 +51,7 @@ class HideColumnDropdownOverlay {
                 onCancel: hide,
                 primaryColor: primaryColor,
                 lightPrimaryColor: lightPrimaryColor,
+                dropDownTitle: dropDownTitle,
               ),
             ),
           ],
@@ -74,6 +76,7 @@ class HideColumnDropdownPanel extends StatelessWidget {
     required this.onCancel,
     required this.primaryColor,
     required this.lightPrimaryColor,
+    required this.dropDownTitle,
   });
 
   final HideColumnCubit cubit;
@@ -81,6 +84,7 @@ class HideColumnDropdownPanel extends StatelessWidget {
   final Function() onCancel;
   final Color primaryColor;
   final Color lightPrimaryColor;
+  final String dropDownTitle;
 
   @override
   Widget build(BuildContext context) {
@@ -105,8 +109,8 @@ class HideColumnDropdownPanel extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text(
-                  'CHỌN CỘT HIỂN THỊ',
+                Text(
+                  dropDownTitle,
                   style: TextStyle(
                       fontFamily: 'Afacad',
                       fontWeight: FontWeight.w600,
@@ -145,6 +149,8 @@ class HideColumnDropdownPanel extends StatelessWidget {
                       label: 'Xác nhận',
                       onPressed: () {
                         cubit.update();
+                        //
+                        onCancel.call();
                       },
                     ),
                   ]
