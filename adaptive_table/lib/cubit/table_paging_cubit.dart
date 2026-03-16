@@ -31,9 +31,14 @@ class TablePagingCubit extends BaseCubit<int> {
     }
   }
 
-  List<int> getSmallIndexes() {
+  List<int> getSmallIndex() {
+    if (count <= 5) return [];
+    return [0];
+  }
+
+  List<int> getMiddleIndexes() {
     if (count <= 5) return List.generate(count, (i) => i);
-    if (state == 0) return List.generate(3, (i) => i);
+    if (state <= 2) return [1,2,3];
     if (state >= count - 3) return List.generate(3, (i) => count - 5 + i);
     return [state - 1, state, state + 1];
   }
@@ -44,7 +49,7 @@ class TablePagingCubit extends BaseCubit<int> {
   }
 
   bool get hasHeadElipsis {
-    return count > 5 && state >= 2;
+    return count > 5 && state > 2;
   }
 
   bool get hasMiddleElipsis {

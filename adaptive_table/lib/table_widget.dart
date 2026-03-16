@@ -120,7 +120,7 @@ class TableWidget<T> extends StatelessWidget {
                     child: Builder(
                         builder: (context) {
                           if (isLoading) {
-                            Column(
+                            return Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 loadingWidget ?? CircularProgressIndicator(color: primaryColor)
@@ -128,7 +128,7 @@ class TableWidget<T> extends StatelessWidget {
                             );
                           }
                           if (isError) {
-                            Column(
+                            return Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 errorWidget ?? Text(errorString ?? 'No Data',

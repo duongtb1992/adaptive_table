@@ -50,9 +50,11 @@ class PagingButtons extends StatelessWidget {
               ),
               const SizedBox(width: 32),
               //index buttons
+              for (int i in cubit.getSmallIndex())
+                _buildItem(context, i, state),
               if (cubit.hasHeadElipsis)
                 _buildItem(context, null, state),
-              for (int i in cubit.getSmallIndexes())
+              for (int i in cubit.getMiddleIndexes())
                 _buildItem(context, i, state),
               if (cubit.hasMiddleElipsis)
                 _buildItem(context, null, state),
