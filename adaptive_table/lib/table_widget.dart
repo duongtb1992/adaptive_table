@@ -28,6 +28,7 @@ class TableWidget<T> extends StatelessWidget {
   final Widget? loadingWidget;
   final bool isError;
   final Widget? errorWidget;
+  final Widget? emptyWidget;
   final String? errorString;
   //
   final bool enableHideColumn;
@@ -40,6 +41,8 @@ class TableWidget<T> extends StatelessWidget {
   final Color primaryColor;
   final Color lightPrimaryColor;
   final List<Color> itemColors;
+  //
+  final Function(T)? onTapItem;
 
   const TableWidget({super.key,
     required this.items,
@@ -61,9 +64,11 @@ class TableWidget<T> extends StatelessWidget {
     ],
     this.loadingWidget,
     this.errorWidget,
+    this.emptyWidget,
     this.onSearchChange,
     this.onSearchSubmit,
     this.searchHintText,
+    this.onTapItem,
   });
 
   @override
@@ -140,9 +145,23 @@ class TableWidget<T> extends StatelessWidget {
                               ],
                             );
                           }
+                          if (items.isEmpty) {
+                            return Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                emptyWidget ?? Text(errorString ?? 'No Data',
+                                  style: TextStyle(
+                                    color: primaryColor,
+                                    fontFamily: 'Afacad',
+                                  ),
+                                )
+                              ],
+                            );
+                          }
                           return TableContent(
                             table: table,
                             itemColors: itemColors,
+                            onTapItem: onTapItem,
                           );
                         }
                     )

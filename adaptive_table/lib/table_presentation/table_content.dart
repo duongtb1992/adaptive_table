@@ -1,3 +1,5 @@
+import 'dart:nativewrappers/_internal/vm/lib/ffi_allocation_patch.dart';
+
 import 'package:flutter/Material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -12,10 +14,12 @@ class TableContent<T> extends StatelessWidget {
       Color(0xfffff8fa),
       Color(0xfff8f8f8),
     ],
+    required this.onTapItem,
   });
 
   final TableModel<T> table;
   final List<Color> itemColors;
+  final Function(T)? onTapItem;
 
   @override
   Widget build(BuildContext context) {
@@ -26,48 +30,55 @@ class TableContent<T> extends StatelessWidget {
           for (final item in table.items)
             Padding(
                 padding: const EdgeInsets.only(bottom: 16),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: itemColors[table.items.indexOf(item) % itemColors.length],
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 12,
-                    horizontal: 24,
-                  ),
-                  child: Row(
-                    children: table.columns.map((col) {
-                      //
-                      if (hiddenColumnCubit.isHidden(col)) {
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(16),
+                  onTap: () {
+                    if (onTapItem == null) return;
+                    onTapItem!.call(item);
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: itemColors[table.items.indexOf(item) % itemColors.length],
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 12,
+                      horizontal: 24,
+                    ),
+                    child: Row(
+                      children: table.columns.map((col) {
+                        //
+                        if (hiddenColumnCubit.isHidden(col)) {
+                          return Container();
+                        }
+                        //
+                        if (col.flex != null) {
+                          return Expanded(
+                              flex: col.flex!,
+                              child: Row(
+                                  mainAxisAlignment: col.alignment ?? MainAxisAlignment.center,
+                                  children: [
+                                    col.buildCell(context, item),
+                                  ]
+                              )
+                          );
+                        }
+                        if (col.width != null) {
+                          return SizedBox(
+                              width: col.width!,
+                              child: Row(
+                                  mainAxisAlignment: col.alignment ?? MainAxisAlignment.center,
+                                  children: [
+                                    col.buildCell(context, item),
+                                  ]
+                              )
+                          );
+                        }
                         return Container();
-                      }
-                      //
-                      if (col.flex != null) {
-                        return Expanded(
-                          flex: col.flex!,
-                          child: Row(
-                            mainAxisAlignment: col.alignment ?? MainAxisAlignment.center,
-                            children: [
-                              col.buildCell(context, item),
-                            ]
-                          )
-                        );
-                      }
-                      if (col.width != null) {
-                        return SizedBox(
-                          width: col.width!,
-                            child: Row(
-                                mainAxisAlignment: col.alignment ?? MainAxisAlignment.center,
-                                children: [
-                                  col.buildCell(context, item),
-                                ]
-                            )
-                        );
-                      }
-                      return Container();
-                    }).toList(),
+                      }).toList(),
+                    ),
                   ),
-                ),
+                )
             )
         ],
       ),
