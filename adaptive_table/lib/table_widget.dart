@@ -1,6 +1,5 @@
 import 'package:adaptive_table/filter/filter_and_search_view.dart';
 import 'package:adaptive_table/paging/paging_buttons.dart';
-import 'package:adaptive_table/search/search_table_text_field.dart';
 import 'package:adaptive_table/table_presentation/table_content.dart';
 import 'package:adaptive_table/table_presentation/table_header.dart';
 import 'package:adaptive_table/title/table_add_data_button.dart';
