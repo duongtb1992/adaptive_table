@@ -25,7 +25,7 @@ class TableHeader<T> extends StatelessWidget {
       children: [
         Padding(
           padding: const EdgeInsets.symmetric(
-              horizontal: 24
+              horizontal: 28
           ),
           child: Row(
             children: table.columns.map((col) {

@@ -52,6 +52,10 @@ class TableWidget<T> extends StatelessWidget {
   final Function(T)? onTapItem;
   final bool hideAddButton;
 
+  final bool showDeleteButton;
+
+  final Function(T)? onDeleteItem;
+
   const TableWidget({
     super.key,
     required this.items,
@@ -76,6 +80,8 @@ class TableWidget<T> extends StatelessWidget {
     this.searchHintText,
     this.onTapItem,
     this.hideAddButton = false,
+    this.showDeleteButton = false,
+    this.onDeleteItem,
   });
 
   @override
@@ -89,34 +95,37 @@ class TableWidget<T> extends StatelessWidget {
         builder: (context, state) {
           return Column(
             children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      TableTitle(text: tableTitle),
-                      const SizedBox(width: 12),
-                      if (!hideAddButton)
-                        TableAddDataButton(onAdd: onAdd, color: primaryColor),
-                    ],
-                  ),
-                  Expanded(
-                    child: FilterAndSearchView(
-                      primaryColor: primaryColor,
-                      lightPrimary: lightPrimaryColor,
-                      columns: columns,
-                      onSearchChange: onSearchChange,
-                      onSearchSubmit: onSearchSubmit,
-                      hintText: searchHintText ?? '',
-                      enableFilter: enableFilter,
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        TableTitle(text: tableTitle),
+                        const SizedBox(width: 12),
+                        if (!hideAddButton)
+                          TableAddDataButton(onAdd: onAdd, color: primaryColor),
+                      ],
                     ),
-                  ),
-                ],
+                    Expanded(
+                      child: FilterAndSearchView(
+                        primaryColor: primaryColor,
+                        lightPrimary: lightPrimaryColor,
+                        columns: columns,
+                        onSearchChange: onSearchChange,
+                        onSearchSubmit: onSearchSubmit,
+                        hintText: searchHintText ?? '',
+                        enableFilter: enableFilter,
+                      ),
+                    ),
+                  ],
+                ),
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                padding: const EdgeInsets.only(top: 8.0),
                 child: TableHeader(
                   table: table,
                   enableHideColumn: enableHideColumn,
@@ -170,6 +179,8 @@ class TableWidget<T> extends StatelessWidget {
                       table: table,
                       itemColors: itemColors,
                       onTapItem: onTapItem,
+                      showDeleteButton: showDeleteButton,
+                      onDeleteItem: onDeleteItem,
                     );
                   },
                 ),
