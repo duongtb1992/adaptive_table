@@ -165,17 +165,14 @@ class TableWidget<T> extends StatelessWidget {
                         }
                     )
                 ),
-                Padding(
-                  padding: EdgeInsets.only(bottom: MediaQuery.of(context).size.height * 0.0667, top: 16),
-                  child: Align(
+                Align(
                     alignment: Alignment.center,
                     child: PagingButtons(
-                        onClickPagingIndex: onClickPagingIndex,
-                        pagingCount: pagingCount,
-                        primaryColor: primaryColor,
-                        lightPrimaryColor: lightPrimaryColor,
+                      onClickPagingIndex: onClickPagingIndex,
+                      pagingCount: pagingCount,
+                      primaryColor: primaryColor,
+                      lightPrimaryColor: lightPrimaryColor,
                     )
-                  ),
                 ),
               ],
             );
