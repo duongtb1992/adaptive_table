@@ -12,16 +12,19 @@ import 'models/table_column_model.dart';
 import 'models/table_model.dart';
 
 class TableWidget<T> extends StatelessWidget {
-
   final String tableTitle;
+
   //
   final List<T> items;
   final List<TableColumnModel<T, dynamic>> columns;
+
   //
   final Function() onAdd;
+
   //
   final Function(String)? onSearchChange, onSearchSubmit;
   final String? searchHintText;
+
   //
   final bool isLoading;
   final Widget? loadingWidget;
@@ -29,21 +32,28 @@ class TableWidget<T> extends StatelessWidget {
   final Widget? errorWidget;
   final Widget? emptyWidget;
   final String? errorString;
+
   //
   final bool enableHideColumn;
+
   //
   final bool enableFilter;
+
   //
   final int pagingCount;
   final Function(int) onClickPagingIndex;
+
   //
   final Color primaryColor;
   final Color lightPrimaryColor;
   final List<Color> itemColors;
+
   //
   final Function(T)? onTapItem;
+  final bool hideAddButton;
 
-  const TableWidget({super.key,
+  const TableWidget({
+    super.key,
     required this.items,
     required this.columns,
     required this.tableTitle,
@@ -56,11 +66,8 @@ class TableWidget<T> extends StatelessWidget {
     this.isError = false,
     this.errorString,
     this.primaryColor = const Color(0xffe33f64),
-    this.lightPrimaryColor= const Color(0xfffff8fa),
-    this.itemColors = const [
-      Color(0xfffff8fa),
-      Color(0xfff8f8f8),
-    ],
+    this.lightPrimaryColor = const Color(0xfffff8fa),
+    this.itemColors = const [Color(0xfffff8fa), Color(0xfff8f8f8)],
     this.loadingWidget,
     this.errorWidget,
     this.emptyWidget,
@@ -68,116 +75,118 @@ class TableWidget<T> extends StatelessWidget {
     this.onSearchSubmit,
     this.searchHintText,
     this.onTapItem,
+    this.hideAddButton = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    final table = TableModel(
-        items: items,
-        columns: columns,
-    );
+    final table = TableModel(items: items, columns: columns);
     return MultiBlocProvider(
       providers: [
-        BlocProvider(
-            create: (context) => HideColumnCubit(columns: columns)
-        )
+        BlocProvider(create: (context) => HideColumnCubit(columns: columns)),
       ],
       child: BlocBuilder<HideColumnCubit, int>(
-          builder: (context, state) {
-            return Column(
-              children: [
-                Row(
+        builder: (context, state) {
+          return Column(
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          TableTitle(text: tableTitle),
-                          const SizedBox(width: 12),
-                          TableAddDataButton(onAdd: onAdd, color: primaryColor)
-                        ],
-                      ),
-                      Expanded(
-                        child: FilterAndSearchView(
-                          primaryColor: primaryColor,
-                          lightPrimary: lightPrimaryColor,
-                          columns: columns,
-                          onSearchChange: onSearchChange,
-                          onSearchSubmit: onSearchSubmit,
-                          hintText: searchHintText ?? '',
-                          enableFilter: enableFilter,
-                        ),
-                      )
-                    ]
-                ),
-                Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8.0),
-                    child: TableHeader(
-                      table: table,
-                      enableHideColumn: enableHideColumn,
-                      color: primaryColor,
-                      lightColor: lightPrimaryColor,
-                    ),
-                ),
-                Expanded(
-                    child: Builder(
-                        builder: (context) {
-                          if (isLoading) {
-                            return Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                loadingWidget ?? CircularProgressIndicator(color: primaryColor)
-                              ],
-                            );
-                          }
-                          if (isError) {
-                            return Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                errorWidget ?? Text(errorString ?? 'No Data',
-                                    style: TextStyle(
-                                      color: primaryColor,
-                                      fontFamily: 'Afacad',
-                                    ),
-                                )
-                              ],
-                            );
-                          }
-                          if (items.isEmpty) {
-                            return Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                emptyWidget ?? Text(errorString ?? 'No Data',
-                                  style: TextStyle(
-                                    color: primaryColor,
-                                    fontFamily: 'Afacad',
-                                  ),
-                                )
-                              ],
-                            );
-                          }
-                          return TableContent(
-                            table: table,
-                            itemColors: itemColors,
-                            onTapItem: onTapItem,
-                          );
-                        }
-                    )
-                ),
-                Align(
-                    alignment: Alignment.center,
-                    child: PagingButtons(
-                      onClickPagingIndex: onClickPagingIndex,
-                      pagingCount: pagingCount,
+                      TableTitle(text: tableTitle),
+                      const SizedBox(width: 12),
+                      if (!hideAddButton)
+                        TableAddDataButton(onAdd: onAdd, color: primaryColor),
+                    ],
+                  ),
+                  Expanded(
+                    child: FilterAndSearchView(
                       primaryColor: primaryColor,
-                      lightPrimaryColor: lightPrimaryColor,
-                    )
+                      lightPrimary: lightPrimaryColor,
+                      columns: columns,
+                      onSearchChange: onSearchChange,
+                      onSearchSubmit: onSearchSubmit,
+                      hintText: searchHintText ?? '',
+                      enableFilter: enableFilter,
+                    ),
+                  ),
+                ],
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: TableHeader(
+                  table: table,
+                  enableHideColumn: enableHideColumn,
+                  color: primaryColor,
+                  lightColor: lightPrimaryColor,
                 ),
-              ],
-            );
-          }
-      )
+              ),
+              Expanded(
+                child: Builder(
+                  builder: (context) {
+                    if (isLoading) {
+                      return Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          loadingWidget ??
+                              CircularProgressIndicator(color: primaryColor),
+                        ],
+                      );
+                    }
+                    if (isError) {
+                      return Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          errorWidget ??
+                              Text(
+                                errorString ?? 'No Data',
+                                style: TextStyle(
+                                  color: primaryColor,
+                                  fontFamily: 'Afacad',
+                                ),
+                              ),
+                        ],
+                      );
+                    }
+                    if (items.isEmpty) {
+                      return Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          emptyWidget ??
+                              Text(
+                                errorString ?? 'No Data',
+                                style: TextStyle(
+                                  color: primaryColor,
+                                  fontFamily: 'Afacad',
+                                ),
+                              ),
+                        ],
+                      );
+                    }
+                    return TableContent(
+                      table: table,
+                      itemColors: itemColors,
+                      onTapItem: onTapItem,
+                    );
+                  },
+                ),
+              ),
+              Align(
+                alignment: Alignment.center,
+                child: PagingButtons(
+                  onClickPagingIndex: onClickPagingIndex,
+                  pagingCount: pagingCount,
+                  primaryColor: primaryColor,
+                  lightPrimaryColor: lightPrimaryColor,
+                ),
+              ),
+            ],
+          );
+        },
+      ),
     );
   }
 }

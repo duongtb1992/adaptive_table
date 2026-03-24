@@ -24,8 +24,8 @@ class FilterShowButton extends StatelessWidget {
         onTap.call(context, buttonKey);
       },
       child: Container(
-        height: 40,
-        padding: EdgeInsets.all(8),
+        height: 30,
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(8),
@@ -36,32 +36,30 @@ class FilterShowButton extends StatelessWidget {
         ),
         child: Row(
           children: [
-            SvgAssetImage('assets/svg/ic_filter.svg', width: 24),
+            SvgAssetImage('assets/svg/ic_filter.svg', width: 18),
             const SizedBox(width: 7),
             Text('Hiển thị',
               style: const TextStyle(
                 fontFamily: 'Afacad',
                 fontWeight: FontWeight.w500,
-                fontSize: 16,
+                fontSize: 13,
                 color: Color(0xff6d6d6d),
               )
             ),
             const SizedBox(width: 7),
             Container(
-              height: 24,
-              width: 24,
-              padding: EdgeInsets.symmetric(vertical: 1),
+              height: 18,
+              width: 18,
               decoration: BoxDecoration(
                 color: primaryColor,
-                borderRadius: BorderRadius.circular(4),
+                borderRadius: BorderRadius.circular(6),
               ),
               alignment: Alignment.center,
               child: Text('$numShow',
                   style: const TextStyle(
                     fontFamily: 'Afacad',
                     fontWeight: FontWeight.w500,
-                    fontSize: 16,
-                    height: 1.2,
+                    fontSize: 11,
                     color: Colors.white,
                   )
               ),

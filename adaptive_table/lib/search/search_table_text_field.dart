@@ -17,7 +17,7 @@ class SearchTableTextField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 40,
+      height: 30,
       width: 258,
       decoration: BoxDecoration(
         color: lightPrimaryColor,
