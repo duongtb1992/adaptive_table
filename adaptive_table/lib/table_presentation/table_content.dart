@@ -99,6 +99,15 @@ class _TableItemRowState<T> extends State<_TableItemRow<T>> {
                 decoration: BoxDecoration(
                   color: widget.itemColor,
                   borderRadius: BorderRadius.circular(16),
+                  boxShadow: _isHovered
+                      ? [
+                    BoxShadow(
+                      color: Colors.black.withAlpha(38),
+                      blurRadius: 6,
+                      offset: const Offset(1, 1),
+                    ),
+                  ]
+                      : [],
                 ),
                 padding: const EdgeInsets.symmetric(
                   vertical: 10,
@@ -142,8 +151,8 @@ class _TableItemRowState<T> extends State<_TableItemRow<T>> {
                 child: GestureDetector(
                   onTap: () => widget.onDeleteItem?.call(widget.item),
                   child: Container(
-                    width: 20,
-                    height: 20,
+                    width: 18,
+                    height: 18,
                     decoration: BoxDecoration(
                       color: Colors.white,
                       shape: BoxShape.circle,
@@ -151,7 +160,7 @@ class _TableItemRowState<T> extends State<_TableItemRow<T>> {
                     ),
                     child: const Icon(
                       Icons.close_rounded,
-                      size: 14,
+                      size: 13,
                       color: Colors.red,
                     ),
                   ),

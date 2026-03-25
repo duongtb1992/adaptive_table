@@ -15,6 +15,9 @@ class TableAddDataButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
+      splashColor: Colors.transparent,
+      hoverColor: Colors.transparent,
+      highlightColor: Colors.transparent,
       onTap: onAdd,
       child: SizedBox(
         width: 28,
