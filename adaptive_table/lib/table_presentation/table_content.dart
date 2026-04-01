@@ -16,6 +16,7 @@ class TableContent<T> extends StatelessWidget {
     this.showDeleteButton = false,
     this.onDeleteItem,
     this.firstItemTopMargin = 16.0,
+    this.expandedRowBuilder
   });
 
   final TableModel<T> table;
@@ -24,6 +25,9 @@ class TableContent<T> extends StatelessWidget {
   final bool showDeleteButton;
   final Function(T)? onDeleteItem;
   final double firstItemTopMargin;
+
+  final Widget Function(T item)? expandedRowBuilder;
+
 
   @override
   Widget build(BuildContext context) {
@@ -45,6 +49,7 @@ class TableContent<T> extends StatelessWidget {
                 onTapItem: onTapItem,
                 hiddenColumnCubit: hiddenColumnCubit,
                 showDeleteButton: showDeleteButton,
+                expandedRowBuilder: expandedRowBuilder,
                 onDeleteItem: onDeleteItem,
               ),
             ),
@@ -62,6 +67,7 @@ class _TableItemRow<T> extends StatefulWidget {
     required this.onTapItem,
     required this.hiddenColumnCubit,
     required this.showDeleteButton,
+    this.expandedRowBuilder,
     required this.onDeleteItem,
   });
 
@@ -72,6 +78,7 @@ class _TableItemRow<T> extends StatefulWidget {
   final HideColumnCubit hiddenColumnCubit;
   final bool showDeleteButton;
   final Function(T)? onDeleteItem;
+  final Widget Function(T item)? expandedRowBuilder;
 
   @override
   State<_TableItemRow<T>> createState() => _TableItemRowState<T>();
@@ -80,95 +87,117 @@ class _TableItemRow<T> extends StatefulWidget {
 class _TableItemRowState<T> extends State<_TableItemRow<T>> {
   bool _isHovered = false;
 
+  bool _isExpanded = false;
+
+
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: MouseRegion(
-        onEnter: (_) => setState(() => _isHovered = true),
-        onExit: (_) => setState(() => _isHovered = false),
-        child: Stack(
-          clipBehavior: Clip.none,
-          children: [
-            InkWell(
-              borderRadius: BorderRadius.circular(16),
-              onTap: () {
-                if (widget.onTapItem == null) return;
-                widget.onTapItem!.call(widget.item);
-              },
-              child: Container(
-                decoration: BoxDecoration(
-                  color: widget.itemColor,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: _isHovered
-                      ? [
-                    BoxShadow(
-                      color: Colors.black.withAlpha(38),
-                      blurRadius: 6,
-                      offset: const Offset(1, 1),
-                    ),
-                  ]
-                      : [],
-                ),
-                padding: const EdgeInsets.symmetric(
-                  vertical: 10,
-                  horizontal: 8
-                ),
-                child: Row(
-                  children: widget.table.columns.map((col) {
-                    if (widget.hiddenColumnCubit.isHidden(col)) {
-                      return Container();
-                    }
-                    if (col.flex != null) {
-                      return Expanded(
-                        flex: col.flex!,
-                        child: Row(
-                          mainAxisAlignment:
-                          col.alignment ?? MainAxisAlignment.center,
-                          children: [col.buildCell(context, widget.item)],
-                        ),
-                      );
-                    }
-                    if (col.width != null) {
-                      return SizedBox(
-                        width: col.width!,
-                        child: Row(
-                          mainAxisAlignment:
-                          col.alignment ?? MainAxisAlignment.center,
-                          children: [col.buildCell(context, widget.item)],
-                        ),
-                      );
-                    }
-                    return Container();
-                  }).toList(),
-                ),
-              ),
-            ),
+    return Column(
+      children: [
+        MouseRegion(
+          onEnter: (_) => setState(() => _isHovered = true),
+          onExit: (_) => setState(() => _isHovered = false),
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              InkWell(
+                borderRadius: BorderRadius.circular(16),
+                onTap: () {
+                  if (widget.onTapItem == null) return;
+                  widget.onTapItem!.call(widget.item);
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: widget.itemColor,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: _isHovered ? [
+                      BoxShadow(
+                        color: Colors.black.withAlpha(38),
+                        blurRadius: 6,
+                        offset: const Offset(1, 1),
+                      ),
+                    ] : [],
+                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+                  child: Row(
+                    children: [
+                      ...widget.table.columns.map((col) {
+                        if (widget.hiddenColumnCubit.isHidden(col)) return Container();
+                        if (col.flex != null) {
+                          return Expanded(
+                            flex: col.flex!,
+                            child: Row(
+                              mainAxisAlignment: col.alignment ?? MainAxisAlignment.center,
+                              children: [col.buildCell(context, widget.item)],
+                            ),
+                          );
+                        }
+                        if (col.width != null) {
+                          return SizedBox(
+                            width: col.width!,
+                            child: Row(
+                              mainAxisAlignment: col.alignment ?? MainAxisAlignment.center,
+                              children: [col.buildCell(context, widget.item)],
+                            ),
+                          );
+                        }
+                        return Container();
+                      }),
 
-            if (widget.showDeleteButton && _isHovered)
-              Positioned(
-                top: -8,
-                right: -8,
-                child: GestureDetector(
-                  onTap: () => widget.onDeleteItem?.call(widget.item),
-                  child: Container(
-                    width: 18,
-                    height: 18,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Colors.red, width: 1),
-                    ),
-                    child: const Icon(
-                      Icons.close_rounded,
-                      size: 13,
-                      color: Colors.red,
-                    ),
+                      if (widget.expandedRowBuilder != null)
+                        GestureDetector(
+                          onTap: () => setState(() => _isExpanded = !_isExpanded),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 2),
+                            child: AnimatedRotation(
+                              turns: _isExpanded ? 0.5 : 0,
+                              duration: const Duration(milliseconds: 200),
+                              child: const Icon(
+                                Icons.expand_more_rounded,
+                                size: 20,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
                 ),
               ),
-          ],
+
+              if (widget.showDeleteButton && _isHovered)
+                Positioned(
+                  top: -8,
+                  right: -8,
+                  child: GestureDetector(
+                    onTap: () => widget.onDeleteItem?.call(widget.item),
+                    child: Container(
+                      width: 18,
+                      height: 18,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.red, width: 1),
+                      ),
+                      child: const Icon(Icons.close_rounded, size: 13, color: Colors.red),
+                    ),
+                  ),
+                ),
+            ],
+          ),
         ),
-      ),
+
+        if (_isExpanded && widget.expandedRowBuilder != null)
+          AnimatedSize(
+            duration: const Duration(milliseconds: 220),
+            curve: Curves.easeInOut,
+            child: Padding(
+              padding: const EdgeInsets.only(top: 4, bottom: 4),
+              child: widget.expandedRowBuilder!(widget.item),
+            ),
+          ),
+      ],
     );
   }
 }

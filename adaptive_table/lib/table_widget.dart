@@ -56,6 +56,8 @@ class TableWidget<T> extends StatelessWidget {
 
   final Function(T)? onDeleteItem;
 
+  final Widget Function(T item)? expandedRowBuilder;
+
   const TableWidget({
     super.key,
     required this.items,
@@ -82,6 +84,7 @@ class TableWidget<T> extends StatelessWidget {
     this.hideAddButton = false,
     this.showDeleteButton = false,
     this.onDeleteItem,
+    this.expandedRowBuilder,
   });
 
   @override
@@ -181,6 +184,7 @@ class TableWidget<T> extends StatelessWidget {
                       onTapItem: onTapItem,
                       showDeleteButton: showDeleteButton,
                       onDeleteItem: onDeleteItem,
+                      expandedRowBuilder: expandedRowBuilder,
                     );
                   },
                 ),
