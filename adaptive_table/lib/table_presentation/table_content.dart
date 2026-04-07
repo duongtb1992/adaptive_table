@@ -16,8 +16,9 @@ class TableContent<T> extends StatelessWidget {
     this.showDeleteButton = false,
     this.onDeleteItem,
     this.firstItemTopMargin = 16.0,
-    this.expandedRowBuilder
-  });
+    this.expandedRowBuilder,
+    this.canDelete,
+  }) ;
 
   final TableModel<T> table;
   final List<Color> itemColors;
@@ -27,6 +28,8 @@ class TableContent<T> extends StatelessWidget {
   final double firstItemTopMargin;
 
   final Widget Function(T item)? expandedRowBuilder;
+
+  final bool Function(T)? canDelete;
 
 
   @override
@@ -51,6 +54,7 @@ class TableContent<T> extends StatelessWidget {
                 showDeleteButton: showDeleteButton,
                 expandedRowBuilder: expandedRowBuilder,
                 onDeleteItem: onDeleteItem,
+                canDelete: canDelete,
               ),
             ),
         ],
@@ -69,6 +73,7 @@ class _TableItemRow<T> extends StatefulWidget {
     required this.showDeleteButton,
     this.expandedRowBuilder,
     required this.onDeleteItem,
+    this.canDelete,
   });
 
   final T item;
@@ -79,6 +84,7 @@ class _TableItemRow<T> extends StatefulWidget {
   final bool showDeleteButton;
   final Function(T)? onDeleteItem;
   final Widget Function(T item)? expandedRowBuilder;
+  final bool Function(T)? canDelete;
 
   @override
   State<_TableItemRow<T>> createState() => _TableItemRowState<T>();
@@ -166,7 +172,7 @@ class _TableItemRowState<T> extends State<_TableItemRow<T>> {
                 ),
               ),
 
-              if (widget.showDeleteButton && _isHovered)
+              if (widget.showDeleteButton && _isHovered && (widget.canDelete?.call(widget.item) ?? true))
                 Positioned(
                   top: -8,
                   right: -8,
