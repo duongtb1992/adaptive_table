@@ -59,6 +59,8 @@ class TableWidget<T> extends StatelessWidget {
   final Widget Function(T item)? expandedRowBuilder;
   final bool Function(T)? canDelete;
 
+  final List<String> initialHiddenKeys;
+  final Function(List<String>)? onHiddenKeysChanged;
 
   const TableWidget({
     super.key,
@@ -87,7 +89,9 @@ class TableWidget<T> extends StatelessWidget {
     this.showDeleteButton = false,
     this.onDeleteItem,
     this.expandedRowBuilder,
-    this.canDelete
+    this.canDelete,
+    this.initialHiddenKeys = const [],
+    this.onHiddenKeysChanged,
   });
 
   @override
@@ -95,7 +99,13 @@ class TableWidget<T> extends StatelessWidget {
     final table = TableModel(items: items, columns: columns);
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (context) => HideColumnCubit(columns: columns)),
+        BlocProvider(
+          create: (context) => HideColumnCubit(
+            columns: columns,
+            onChanged: onHiddenKeysChanged,
+            initialHiddenKeys: initialHiddenKeys,
+          ),
+        ),
       ],
       child: BlocBuilder<HideColumnCubit, int>(
         builder: (context, state) {
