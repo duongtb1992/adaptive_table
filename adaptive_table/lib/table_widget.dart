@@ -206,6 +206,7 @@ class TableWidget<T> extends StatelessWidget {
               Align(
                 alignment: Alignment.center,
                 child: PagingButtons(
+                  key: ValueKey(pagingCount),
                   onClickPagingIndex: onClickPagingIndex,
                   pagingCount: pagingCount,
                   primaryColor: primaryColor,
