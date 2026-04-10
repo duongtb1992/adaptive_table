@@ -135,7 +135,9 @@ class _TableItemRowState<T> extends State<_TableItemRow<T>> {
                             flex: col.flex!,
                             child: Row(
                               mainAxisAlignment: col.alignment ?? MainAxisAlignment.center,
-                              children: [col.buildCell(context, widget.item)],
+                              children: [
+                                Flexible(child: col.buildCell(context, widget.item)), // ✅
+                              ],
                             ),
                           );
                         }
@@ -144,7 +146,9 @@ class _TableItemRowState<T> extends State<_TableItemRow<T>> {
                             width: col.width!,
                             child: Row(
                               mainAxisAlignment: col.alignment ?? MainAxisAlignment.center,
-                              children: [col.buildCell(context, widget.item)],
+                              children: [
+                                Flexible(child: col.buildCell(context, widget.item)), // ✅
+                              ],
                             ),
                           );
                         }
