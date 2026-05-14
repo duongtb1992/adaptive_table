@@ -9,14 +9,15 @@ import '../models/table_column_model.dart';
 class HideColumnDropdownOverlay {
   static OverlayEntry? _overlayEntry;
 
-  static void show(BuildContext context,
-      GlobalKey key,
-      HideColumnCubit cubit,
-      List<TableColumnBase> columns,
-      Color primaryColor,
-      Color lightPrimaryColor,
-      {String dropDownTitle = 'CHỌN CỘT HIỂN THỊ'}
-  ) {
+  static void show(
+    BuildContext context,
+    GlobalKey key,
+    HideColumnCubit cubit,
+    List<TableColumnBase> columns,
+    Color primaryColor,
+    Color lightPrimaryColor, {
+    String dropDownTitle = 'CHỌN CỘT HIỂN THỊ',
+  }) {
     if (_overlayEntry != null) {
       hide();
       return;
@@ -25,10 +26,7 @@ class HideColumnDropdownOverlay {
     final renderBox = key.currentContext!.findRenderObject() as RenderBox;
     final overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
 
-    final position = renderBox.localToGlobal(
-      Offset.zero,
-      ancestor: overlay,
-    );
+    final position = renderBox.localToGlobal(Offset.zero, ancestor: overlay);
 
     final size = renderBox.size;
 
@@ -69,8 +67,8 @@ class HideColumnDropdownOverlay {
 }
 
 class HideColumnDropdownPanel extends StatelessWidget {
-
-  const HideColumnDropdownPanel({super.key,
+  const HideColumnDropdownPanel({
+    super.key,
     required this.cubit,
     required this.columns,
     required this.onCancel,
@@ -97,69 +95,81 @@ class HideColumnDropdownPanel extends StatelessWidget {
         builder: (context, state) {
           return Container(
             width: 267,
-            padding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 12,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  dropDownTitle,
-                  style: TextStyle(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxHeight: 420),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    dropDownTitle,
+                    style: const TextStyle(
                       fontFamily: 'Afacad',
                       fontWeight: FontWeight.w600,
                       fontSize: 20,
-                      height: 1.25
+                      height: 1.25,
+                    ),
                   ),
-                ),
-                ...columns.map((e) {
-                  bool isLastIndex = columns.indexOf(e) == columns.length - 1;
-                  return CustomTickBox(
-                      text: e.title,
-                      isTick: !cubit.isPendingHidden(e),
-                      isLastIndex: isLastIndex,
-                      onTap: () {
-                        cubit.hideOrUnhide(e);
-                      },
-                    primaryColor: primaryColor,
-                  );
-                }),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    CustomButton(
-                      label: 'Huỷ bỏ',
-                      onPressed: onCancel,
-                      borderColor: Colors.transparent,
-                      bgColor: Colors.transparent,
-                      textColor: Color(0xff757575),
-                      useShadow: false,
+
+                  const SizedBox(height: 12),
+
+                  Flexible(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: columns.map((e) {
+                          bool isLastIndex =
+                              columns.indexOf(e) == columns.length - 1;
+
+                          return CustomTickBox(
+                            text: e.title,
+                            isTick: !cubit.isPendingHidden(e),
+                            isLastIndex: isLastIndex,
+                            onTap: () {
+                              cubit.hideOrUnhide(e);
+                            },
+                            primaryColor: primaryColor,
+                          );
+                        }).toList(),
+                      ),
                     ),
-                    const SizedBox(width: 9),
-                    CustomButton(
-                      borderColor: primaryColor,
-                      bgColor: lightPrimaryColor,
-                      textColor: primaryColor,
-                      label: 'Xác nhận',
-                      onPressed: () {
-                        cubit.update();
-                        //
-                        onCancel.call();
-                      },
-                    ),
-                  ]
-                ),
-              ],
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      CustomButton(
+                        label: 'Huỷ bỏ',
+                        onPressed: onCancel,
+                        borderColor: Colors.transparent,
+                        bgColor: Colors.transparent,
+                        textColor: const Color(0xff757575),
+                        useShadow: false,
+                      ),
+                      const SizedBox(width: 9),
+                      CustomButton(
+                        borderColor: primaryColor,
+                        bgColor: lightPrimaryColor,
+                        textColor: primaryColor,
+                        label: 'Xác nhận',
+                        onPressed: () {
+                          cubit.update();
+                          onCancel.call();
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           );
         },
-      )
+      ),
     );
   }
 }
