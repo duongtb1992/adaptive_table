@@ -3,6 +3,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../cubit/hide_column_cubit.dart';
 import '../models/table_model.dart';
+import '../models/table_column_model.dart';
+import '../table_widget.dart';
 
 class TableContent<T> extends StatelessWidget {
   const TableContent({
@@ -18,6 +20,7 @@ class TableContent<T> extends StatelessWidget {
     this.firstItemTopMargin = 16.0,
     this.expandedRowBuilder,
     this.canDelete,
+    required this.syncController,
   }) ;
 
   final TableModel<T> table;
@@ -30,6 +33,8 @@ class TableContent<T> extends StatelessWidget {
   final Widget Function(T item)? expandedRowBuilder;
 
   final bool Function(T)? canDelete;
+  
+  final SyncScrollControllerGroup syncController;
 
 
   @override
@@ -55,6 +60,7 @@ class TableContent<T> extends StatelessWidget {
                 expandedRowBuilder: expandedRowBuilder,
                 onDeleteItem: onDeleteItem,
                 canDelete: canDelete,
+                syncController: syncController,
               ),
             ),
         ],
@@ -74,6 +80,7 @@ class _TableItemRow<T> extends StatefulWidget {
     this.expandedRowBuilder,
     required this.onDeleteItem,
     this.canDelete,
+    required this.syncController,
   });
 
   final T item;
@@ -85,6 +92,7 @@ class _TableItemRow<T> extends StatefulWidget {
   final Function(T)? onDeleteItem;
   final Widget Function(T item)? expandedRowBuilder;
   final bool Function(T)? canDelete;
+  final SyncScrollControllerGroup syncController;
 
   @override
   State<_TableItemRow<T>> createState() => _TableItemRowState<T>();
@@ -99,6 +107,35 @@ class _TableItemRowState<T> extends State<_TableItemRow<T>> {
 
   @override
   Widget build(BuildContext context) {
+    Widget buildCell(TableColumnBase col) {
+      if (col.flex != null) {
+        return Expanded(
+          flex: col.flex!,
+          child: Row(
+            mainAxisAlignment: col.alignment ?? MainAxisAlignment.center,
+            children: [
+              Flexible(child: col.buildCell(context, widget.item)), // ✅
+            ],
+          ),
+        );
+      }
+      if (col.width != null) {
+        return SizedBox(
+          width: col.width!,
+          child: Row(
+            mainAxisAlignment: col.alignment ?? MainAxisAlignment.center,
+            children: [
+              Flexible(child: col.buildCell(context, widget.item)), // ✅
+            ],
+          ),
+        );
+      }
+      return Container();
+    }
+
+    final fixedCols = widget.table.columns.where((c) => c.isFixed && !widget.hiddenColumnCubit.isHidden(c)).toList();
+    final scrollCols = widget.table.columns.where((c) => !c.isFixed && !widget.hiddenColumnCubit.isHidden(c)).toList();
+
     return Column(
       children: [
         MouseRegion(
@@ -128,32 +165,17 @@ class _TableItemRowState<T> extends State<_TableItemRow<T>> {
                   padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
                   child: Row(
                     children: [
-                      ...widget.table.columns.map((col) {
-                        if (widget.hiddenColumnCubit.isHidden(col)) return Container();
-                        if (col.flex != null) {
-                          return Expanded(
-                            flex: col.flex!,
+                      ...fixedCols.map(buildCell),
+                      if (scrollCols.isNotEmpty)
+                        Expanded(
+                          child: SingleChildScrollView(
+                            controller: widget.syncController.addAndGet(),
+                            scrollDirection: Axis.horizontal,
                             child: Row(
-                              mainAxisAlignment: col.alignment ?? MainAxisAlignment.center,
-                              children: [
-                                Flexible(child: col.buildCell(context, widget.item)), // ✅
-                              ],
+                              children: scrollCols.map(buildCell).toList(),
                             ),
-                          );
-                        }
-                        if (col.width != null) {
-                          return SizedBox(
-                            width: col.width!,
-                            child: Row(
-                              mainAxisAlignment: col.alignment ?? MainAxisAlignment.center,
-                              children: [
-                                Flexible(child: col.buildCell(context, widget.item)), // ✅
-                              ],
-                            ),
-                          );
-                        }
-                        return Container();
-                      }),
+                          ),
+                        ),
 
                       if (widget.expandedRowBuilder != null)
                         GestureDetector(

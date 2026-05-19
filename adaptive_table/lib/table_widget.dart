@@ -38,6 +38,7 @@ class TableWidget<T> extends StatelessWidget {
 
   //
   final bool enableFilter;
+  final Widget? cardsWidget;
 
   //
   final int pagingCount;
@@ -70,6 +71,7 @@ class TableWidget<T> extends StatelessWidget {
     required this.onAdd,
     this.enableHideColumn = false,
     this.enableFilter = true,
+    this.cardsWidget,
     this.pagingCount = 1,
     required this.onClickPagingIndex,
     this.isLoading = false,
@@ -107,116 +109,178 @@ class TableWidget<T> extends StatelessWidget {
           ),
         ),
       ],
-      child: BlocBuilder<HideColumnCubit, int>(
-        builder: (context, state) {
-          return Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
+      child: SyncScrollProvider(
+        builder: (context, syncController) {
+          return BlocBuilder<HideColumnCubit, int>(
+            builder: (context, state) {
+              return Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        TableTitle(text: tableTitle),
-                        const SizedBox(width: 12),
-                        if (!hideAddButton)
-                          TableAddDataButton(onAdd: onAdd, color: primaryColor),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            TableTitle(text: tableTitle),
+                            const SizedBox(width: 12),
+                            if (!hideAddButton)
+                              TableAddDataButton(
+                                onAdd: onAdd,
+                                color: primaryColor,
+                              ),
+                          ],
+                        ),
+                        Expanded(
+                          child: FilterAndSearchView(
+                            primaryColor: primaryColor,
+                            lightPrimary: lightPrimaryColor,
+                            columns: columns,
+                            onSearchChange: onSearchChange,
+                            onSearchSubmit: onSearchSubmit,
+                            hintText: searchHintText ?? '',
+                            enableFilter: enableFilter,
+                          ),
+                        ),
                       ],
                     ),
-                    Expanded(
-                      child: FilterAndSearchView(
-                        primaryColor: primaryColor,
-                        lightPrimary: lightPrimaryColor,
-                        columns: columns,
-                        onSearchChange: onSearchChange,
-                        onSearchSubmit: onSearchSubmit,
-                        hintText: searchHintText ?? '',
-                        enableFilter: enableFilter,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 8.0),
-                child: TableHeader(
-                  table: table,
-                  enableHideColumn: enableHideColumn,
-                  color: primaryColor,
-                  lightColor: lightPrimaryColor,
-                ),
-              ),
-              Expanded(
-                child: Builder(
-                  builder: (context) {
-                    if (isLoading) {
-                      return Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          loadingWidget ??
-                              CircularProgressIndicator(color: primaryColor),
-                        ],
-                      );
-                    }
-                    if (isError) {
-                      return Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          errorWidget ??
-                              Text(
-                                errorString ?? 'No Data',
-                                style: TextStyle(
-                                  color: primaryColor,
-                                  fontFamily: 'Afacad',
-                                ),
-                              ),
-                        ],
-                      );
-                    }
-                    if (items.isEmpty) {
-                      return Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          emptyWidget ??
-                              Text(
-                                errorString ?? 'No Data',
-                                style: TextStyle(
-                                  color: primaryColor,
-                                  fontFamily: 'Afacad',
-                                ),
-                              ),
-                        ],
-                      );
-                    }
-                    return TableContent(
+                  ),
+                  ?cardsWidget,
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: TableHeader(
                       table: table,
-                      itemColors: itemColors,
-                      onTapItem: onTapItem,
-                      showDeleteButton: showDeleteButton,
-                      onDeleteItem: onDeleteItem,
-                      expandedRowBuilder: expandedRowBuilder,
-                      canDelete: canDelete,
-                    );
-                  },
-                ),
-              ),
-              Align(
-                alignment: Alignment.center,
-                child: PagingButtons(
-                  key: ValueKey(pagingCount),
-                  onClickPagingIndex: onClickPagingIndex,
-                  pagingCount: pagingCount,
-                  primaryColor: primaryColor,
-                  lightPrimaryColor: lightPrimaryColor,
-                ),
-              ),
-            ],
+                      enableHideColumn: enableHideColumn,
+                      color: primaryColor,
+                      lightColor: lightPrimaryColor,
+                      syncController: syncController,
+                    ),
+                  ),
+
+                  Expanded(
+                    child: Builder(
+                      builder: (context) {
+                        if (isLoading) {
+                          return Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              loadingWidget ??
+                                  CircularProgressIndicator(
+                                    color: primaryColor,
+                                  ),
+                            ],
+                          );
+                        }
+                        if (isError) {
+                          return Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              errorWidget ??
+                                  Text(
+                                    errorString ?? 'No Data',
+                                    style: TextStyle(
+                                      color: primaryColor,
+                                      fontFamily: 'Afacad',
+                                    ),
+                                  ),
+                            ],
+                          );
+                        }
+                        if (items.isEmpty) {
+                          return Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              emptyWidget ??
+                                  Text(
+                                    errorString ?? 'No Data',
+                                    style: TextStyle(
+                                      color: primaryColor,
+                                      fontFamily: 'Afacad',
+                                    ),
+                                  ),
+                            ],
+                          );
+                        }
+                        return TableContent(
+                          table: table,
+                          itemColors: itemColors,
+                          onTapItem: onTapItem,
+                          showDeleteButton: showDeleteButton,
+                          onDeleteItem: onDeleteItem,
+                          expandedRowBuilder: expandedRowBuilder,
+                          canDelete: canDelete,
+                          syncController: syncController,
+                        );
+                      },
+                    ),
+                  ),
+                  Align(
+                    alignment: Alignment.center,
+                    child: PagingButtons(
+                      key: ValueKey(pagingCount),
+                      onClickPagingIndex: onClickPagingIndex,
+                      pagingCount: pagingCount,
+                      primaryColor: primaryColor,
+                      lightPrimaryColor: lightPrimaryColor,
+                    ),
+                  ),
+                ],
+              );
+            },
           );
         },
       ),
     );
   }
+}
+
+class SyncScrollControllerGroup {
+  final List<ScrollController> _controllers = [];
+  double _offset = 0;
+
+  ScrollController addAndGet() {
+    final c = ScrollController(initialScrollOffset: _offset);
+    _controllers.add(c);
+    c.addListener(() {
+      if (c.offset == _offset) return;
+      _offset = c.offset;
+      for (var other in _controllers) {
+        if (other != c && other.hasClients) {
+          other.position.jumpTo(_offset);
+        }
+      }
+    });
+    return c;
+  }
+
+  void dispose() {
+    for (var c in _controllers) {
+      c.dispose();
+    }
+  }
+}
+
+class SyncScrollProvider extends StatefulWidget {
+  final Widget Function(
+    BuildContext context,
+    SyncScrollControllerGroup controller,
+  )
+  builder;
+  const SyncScrollProvider({super.key, required this.builder});
+  @override
+  State<SyncScrollProvider> createState() => _SyncScrollProviderState();
+}
+
+class _SyncScrollProviderState extends State<SyncScrollProvider> {
+  final controller = SyncScrollControllerGroup();
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => widget.builder(context, controller);
 }

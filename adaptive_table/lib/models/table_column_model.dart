@@ -8,11 +8,14 @@ abstract class TableColumnBase<T> {
 
   Widget buildFilter(BuildContext context);
 
-
   int? get flex;
   double? get width;
   MainAxisAlignment? alignment;
   bool get hasFilter;
+
+  /// If true, column is pinned (does not scroll horizontally).
+  /// Defaults to true for backward compatibility.
+  bool get isFixed;
 }
 
 
@@ -40,6 +43,9 @@ class TableColumnModel<T, V> extends TableColumnBase<T> {
   @override
   final MainAxisAlignment? alignment;
 
+  @override
+  final bool isFixed;
+
   TableColumnModel({
     required this.title,
     required this.key,
@@ -49,7 +55,12 @@ class TableColumnModel<T, V> extends TableColumnBase<T> {
     this.flex,
     this.alignment = MainAxisAlignment.center,
     this.filterBuilder,
-  });
+    this.isFixed = true,
+  }) : assert(
+          isFixed || width != null,
+          'Column "$key" has isFixed=false but no width is set. '
+          'Scrollable columns must have an explicit width.',
+        );
 
   @override
   Widget buildCell(BuildContext context, T item) {
