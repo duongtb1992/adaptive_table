@@ -6,7 +6,7 @@ class TableTitle extends StatelessWidget {
     required this.text,
     this.fontFamily = 'Unbounded',
     this.fontWeight = FontWeight.w600,
-    this.fontSize = 22,
+    this.fontSize,
     this.color = const Color(0xff3D3D3D),
     this.height = 1.25,
   });
@@ -14,7 +14,7 @@ class TableTitle extends StatelessWidget {
   final String text;
   final String fontFamily;
   final FontWeight fontWeight;
-  final double fontSize;
+  final double? fontSize;
   final Color color;
   final double height;
 
@@ -25,7 +25,7 @@ class TableTitle extends StatelessWidget {
       style: TextStyle(
         fontFamily: fontFamily,
         fontWeight: fontWeight,
-        fontSize: fontSize,
+        fontSize: fontSize ?? 20,
         color: color,
         height: height,
       ),

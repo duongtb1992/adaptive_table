@@ -33,7 +33,7 @@ class TableContent<T> extends StatelessWidget {
   final Widget Function(T item)? expandedRowBuilder;
 
   final bool Function(T)? canDelete;
-  
+
   final SyncScrollControllerGroup syncController;
 
 
@@ -114,7 +114,7 @@ class _TableItemRowState<T> extends State<_TableItemRow<T>> {
           child: Row(
             mainAxisAlignment: col.alignment ?? MainAxisAlignment.center,
             children: [
-              Flexible(child: col.buildCell(context, widget.item)), // ✅
+              Flexible(child: col.buildCell(context, widget.item)),
             ],
           ),
         );
@@ -125,7 +125,7 @@ class _TableItemRowState<T> extends State<_TableItemRow<T>> {
           child: Row(
             mainAxisAlignment: col.alignment ?? MainAxisAlignment.center,
             children: [
-              Flexible(child: col.buildCell(context, widget.item)), // ✅
+              Flexible(child: col.buildCell(context, widget.item)),
             ],
           ),
         );

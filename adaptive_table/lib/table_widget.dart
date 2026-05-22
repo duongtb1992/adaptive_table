@@ -62,6 +62,9 @@ class TableWidget<T> extends StatelessWidget {
 
   final List<String> initialHiddenKeys;
   final Function(List<String>)? onHiddenKeysChanged;
+  final double? headerFontSize;
+  final double? fontSizeTitle;
+  final double firstItemTopMargin;
 
   const TableWidget({
     super.key,
@@ -94,6 +97,9 @@ class TableWidget<T> extends StatelessWidget {
     this.canDelete,
     this.initialHiddenKeys = const [],
     this.onHiddenKeysChanged,
+    this.headerFontSize,
+    this.fontSizeTitle,
+    this.firstItemTopMargin = 4.0,
   });
 
   @override
@@ -124,8 +130,11 @@ class TableWidget<T> extends StatelessWidget {
                           mainAxisSize: MainAxisSize.min,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            TableTitle(text: tableTitle),
-                            const SizedBox(width: 12),
+                            TableTitle(
+                              text: tableTitle,
+                              fontSize: fontSizeTitle,
+                            ),
+                            const SizedBox(width: 4),
                             if (!hideAddButton)
                               TableAddDataButton(
                                 onAdd: onAdd,
@@ -133,6 +142,8 @@ class TableWidget<T> extends StatelessWidget {
                               ),
                           ],
                         ),
+                        const SizedBox(width: 6),
+
                         Expanded(
                           child: FilterAndSearchView(
                             primaryColor: primaryColor,
@@ -152,13 +163,13 @@ class TableWidget<T> extends StatelessWidget {
                     padding: const EdgeInsets.only(top: 8.0),
                     child: TableHeader(
                       table: table,
+                      fontSize: headerFontSize,
                       enableHideColumn: enableHideColumn,
                       color: primaryColor,
                       lightColor: lightPrimaryColor,
                       syncController: syncController,
                     ),
                   ),
-
                   Expanded(
                     child: Builder(
                       builder: (context) {
@@ -212,6 +223,7 @@ class TableWidget<T> extends StatelessWidget {
                           expandedRowBuilder: expandedRowBuilder,
                           canDelete: canDelete,
                           syncController: syncController,
+                          firstItemTopMargin: firstItemTopMargin,
                         );
                       },
                     ),
@@ -268,13 +280,16 @@ class SyncScrollProvider extends StatefulWidget {
     SyncScrollControllerGroup controller,
   )
   builder;
+
   const SyncScrollProvider({super.key, required this.builder});
+
   @override
   State<SyncScrollProvider> createState() => _SyncScrollProviderState();
 }
 
 class _SyncScrollProviderState extends State<SyncScrollProvider> {
   final controller = SyncScrollControllerGroup();
+
   @override
   void dispose() {
     controller.dispose();
